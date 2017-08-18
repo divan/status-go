@@ -56,7 +56,9 @@ func (s *JailRPCTestSuite) SetupTest() {
 	acctman := node.NewAccountManager(nodeman)
 	require.NotNil(acctman)
 
-	policy := jail.NewExecutionPolicy(nodeman, acctman)
+	txQueueManager := node.NewTxQueueManager(nodeman, acctman)
+
+	policy := jail.NewExecutionPolicy(nodeman, acctman, txQueueManager)
 	require.NotNil(policy)
 
 	s.Policy = policy
@@ -164,7 +166,7 @@ func (s *JailRPCTestSuite) TestSendTransaction() {
 	selectErr := s.Account.SelectAccount(TestConfig.Account1.Address, TestConfig.Account1.Password)
 	require.NoError(selectErr)
 
-	res, err := s.Policy.ExecuteSendTransaction(request, odFunc)
+	res, err := s.Policy.Execute(request, odFunc)
 	require.NoError(err)
 
 	result, err := res.Get("result")
